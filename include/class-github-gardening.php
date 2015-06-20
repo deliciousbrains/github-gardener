@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Class GitHubGardening
+ *
+ * @package     github-gardener
+ * @copyright   Copyright (c) 2015, Delicious Brains
+ * @author      Iain Poulson
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ */
 class GitHubGardening {
 
 	/**
@@ -118,11 +126,5 @@ class GitHubGardening {
 				$this->client->issues->comments->createComment( $this->owner, $repo, $id, $comment );
 			}
 		}
-	}
-
-	private function _log( $message ) {
-		print '<pre>';
-		print_r( $message );
-		print '</pre>';
 	}
 }
