@@ -9,7 +9,8 @@ require_once( __DIR__ . '/vendor/autoload.php' );
 require_once( __DIR__ . '/include/class-github-gardening.php' );
 
 $gardening = new GitHubGardening( $access_token );
-$gardening->needs_merge();
+
+$gardening->notifyMergeIssuePullRequests();
 $gardening->notifyUndeletedBranches();
 
 

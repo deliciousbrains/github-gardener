@@ -40,7 +40,7 @@ class GitHubGardening {
 	/**
 	 * Removes redundant labels from closed PRs
 	 */
-	public function closed_pulls() {
+	public function cleanClosedPullRequestLabels() {
 		foreach ( $this->repos as $repo ) {
 			$pulls = $this->client->pulls->listPullRequests( $this->owner, $repo, 'closed' );
 
@@ -72,13 +72,11 @@ class GitHubGardening {
 		}
 	}
 
-
 	/**
 	 * Check for open PRs ready for review that are not mergeable
 	 */
-	public function needs_merge() {
+	public function notifyMergeIssuePullRequests() {
 		foreach ( $this->repos as $repo ) {
-			$this->_log( $repo );
 			$pulls = $this->client->pulls->listPullRequests( $this->owner, $repo, 'open' );
 
 			foreach ( $pulls as $pull ) {
