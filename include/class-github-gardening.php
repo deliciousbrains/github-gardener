@@ -126,6 +126,34 @@ class GitHubGardening {
 			}
 		}
 	}
+
+	/**
+	 * Notify authors of closed PRs that have not had their branch deleted.
+	 * This ignores release branches.
+	 */
+	public function notifyUndeletedBranches() {
+		foreach ( $this->repos as $repo ) {
+			$pulls = $this->client->pulls->listPullRequests( $this->owner, $repo, 'closed' );
+
+			$branches = $this->client->repos->listBranches( $this->owner, $repo );
+
+			$all_branches = array();
+			foreach ( $branches as $branch ) {
+				$all_branches[] = $branch->getName();
+			}
+
+			foreach ( $pulls as $pull ) {
+				$branch = $pull->getHead()->getRef();
+
+				if ( in_array( $branch, $all_branches ) && false === strpos( $branch, 'release' ) ) {
+					// Add comment
+					$comment = '@' . $this->getPullRequestAuthor( $pull ) . ' branch needs deleting';
+					$this->client->issues->comments->createComment( $this->owner, $repo, $pull->getNumber(), $comment );
+				}
+			}
+		}
+	}
+
 	/**
 	 * Get the author of the pull request
 	 *

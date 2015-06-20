@@ -6,7 +6,8 @@ The script is meant to be run on a cron job to keep things clean.
 
 Currently the script does:
 
-- Check for open PRs ready for review that are not mergeable, and adds a label and comment to the author
+- Check for open PRs ready for review that are not mergeable, and adds a label and comment to the author.
+- Checks for un-deleted branches on closed PRs, excluding branches with 'release' in their name.
 
 Coming soon:
 
