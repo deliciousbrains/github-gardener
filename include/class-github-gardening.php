@@ -48,9 +48,9 @@ class GitHubGardening {
 				$id     = $pull->getNumber();
 				$labels = $this->client->issues->labels->listLabelsOnAnIssue( $this->owner, $repo, $id );
 
-				$process_replacement        = false;
-				$redundant_labels = array( 'ready for review', 'needs merge' );
-				$labels_to_remove           = array();
+				$process_replacement = false;
+				$redundant_labels    = array( 'ready for review', 'needs merge' );
+				$labels_to_remove    = array();
 				foreach ( $labels as $label ) {
 					if ( in_array( $label->getName(), $redundant_labels ) ) {
 						$labels_to_remove[]  = $label->getName();
@@ -63,7 +63,7 @@ class GitHubGardening {
 				}
 
 				// Remove redundant labels
-				foreach( $labels_to_remove as $label ) {
+				foreach ( $labels_to_remove as $label ) {
 					// TODO
 					#$this->client->issues->labels->removeLabelFromAnIssue( $this->owner, $repo, $id, $label );
 				}
@@ -78,7 +78,7 @@ class GitHubGardening {
 	 */
 	public function needs_merge() {
 		foreach ( $this->repos as $repo ) {
-		$this->_log( $repo );
+			$this->_log( $repo );
 			$pulls = $this->client->pulls->listPullRequests( $this->owner, $repo, 'open' );
 
 			foreach ( $pulls as $pull ) {
@@ -120,7 +120,7 @@ class GitHubGardening {
 				$this->client->issues->labels->addLabelsToAnIssue( $this->owner, $repo, $id, $label );
 
 				// Add comment
-				$user = $pull_request->getUser();
+				$user    = $pull_request->getUser();
 				$comment = '@' . $user->getLogin() . ' needs develop merged in';
 				// @username Needs develop merged in
 				$this->client->issues->comments->createComment( $this->owner, $repo, $id, $comment );
