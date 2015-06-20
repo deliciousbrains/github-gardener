@@ -1,0 +1,13 @@
+{
+  "name": "deliciousbrains/github-gardener",
+  "description": "Gardening of GitHub issues and pull requests",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/polevaultweb/github-php-client"
+    }
+  ],
+  "require": {
+    "tan-tan-kanarek/github-php-client": "dev-develop"
+  }
+}
