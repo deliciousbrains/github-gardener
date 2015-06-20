@@ -120,11 +120,30 @@ class GitHubGardening {
 				$this->client->issues->labels->addLabelsToAnIssue( $this->owner, $repo, $id, $label );
 
 				// Add comment
-				$user    = $pull_request->getUser();
-				$comment = '@' . $user->getLogin() . ' needs develop merged in';
+				$comment = '@' . $this->getPullRequestAuthor( $pull_request ) . ' needs develop merged in';
 				// @username Needs develop merged in
 				$this->client->issues->comments->createComment( $this->owner, $repo, $id, $comment );
 			}
 		}
+	}
+	/**
+	 * Get the author of the pull request
+	 *
+	 * @param int|GitHubFullPull $pull
+	 * @param string             $repo
+	 *
+	 * @return string
+	 */
+	private function getPullRequestAuthor( $pull, $repo = '' ) {
+		if ( ! is_object( $pull ) ) {
+			$pull = $this->client->pulls->getSinglePullRequest( $this->owner, $repo, $pull );
+		}
+
+		$user = $pull->getUser();
+
+		// TODO check the author is still a valid team member
+		// TODO else use last committer on repo
+
+		return $user->getLogin();
 	}
 }
