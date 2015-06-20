@@ -17,6 +17,6 @@ Coming soon:
 
 - Clone the repo
 - Run `composer install`
-- Rename the `.env-sample.php` to `.env.php` file on your server
-- Add your GitHub personal access token `.env.php`
+- Rename the `.env-sample.php` to `.env.php`
+- Add your GitHub [personal access token](https://github.com/settings/tokens) `.env.php` 
 - Set up a cron job to hit `index.php` on a desired schedule
