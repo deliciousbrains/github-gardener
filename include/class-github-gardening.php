@@ -45,11 +45,6 @@ class GitHubGardening {
 	 */
 	protected $branches;
 
-	/**
-	 * @var
-	 */
-	protected $branch_names;
-
 	const MASTER_BRANCH = 'develop';
 
 	/**
@@ -144,14 +139,12 @@ class GitHubGardening {
 	 * Get the branches for a repository and store them in an array and one just for names
 	 */
 	protected function getBranches() {
-		$this->branches = $this->client->repos->listBranches( $this->owner, $this->repo );
+		$branches       = $this->client->repos->listBranches( $this->owner, $this->repo );
+		$this->branches = array();
 
-		$names = array();
-		foreach ( $this->branches as $branch ) {
-			$names[] = $branch->getName();
+		foreach ( $branches as $branch ) {
+			$this->branches[ $branch->getName() ] = $branch;
 		}
-
-		$this->branch_names = $names;
 	}
 
 	/**
@@ -254,7 +247,7 @@ class GitHubGardening {
 
 		$branch = $this->pull->getHead()->getRef();
 
-		if ( in_array( $branch, $this->branch_names ) && false === strpos( $branch, 'release' ) ) {
+		if ( isset( $this->branches[ $branch ] ) && false === strpos( $branch, 'release' ) ) {
 			// Add comment
 			$comment = $this->getUserComment( $this->pull, 'branch needs deleting' );
 			$this->client->issues->comments->createComment( $this->owner, $this->repo, $this->pull->getNumber(), $comment );
