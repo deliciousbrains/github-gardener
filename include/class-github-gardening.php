@@ -118,7 +118,7 @@ class GitHubGardening {
 				$this->client->issues->labels->addLabelsToAnIssue( $this->owner, $repo, $id, $label );
 
 				// Add comment
-				$comment = '@' . $this->getPullRequestAuthor( $pull_request ) . ' needs develop merged in';
+				$comment = $this->getComment( $pull_request, 'needs develop merged in' );
 				// @username Needs develop merged in
 				$this->client->issues->comments->createComment( $this->owner, $repo, $id, $comment );
 			}
@@ -145,7 +145,7 @@ class GitHubGardening {
 
 				if ( in_array( $branch, $all_branches ) && false === strpos( $branch, 'release' ) ) {
 					// Add comment
-					$comment = '@' . $this->getPullRequestAuthor( $pull ) . ' branch needs deleting';
+					$comment = $this->getComment( $pull, 'branch needs deleting' );
 					$this->client->issues->comments->createComment( $this->owner, $repo, $pull->getNumber(), $comment );
 				}
 			}
@@ -210,5 +210,19 @@ class GitHubGardening {
 		// TODO else use last committer on repo
 
 		return $user->getLogin();
+	}
+
+	/**
+	 * Get the comment to be added to a Pull
+	 *
+	 * @param int|GitHubFullPull $pull
+	 * @param string             $text
+	 *
+	 * @return string
+	 */
+	private function getComment( $pull, $text ) {
+		$comment = '@' . $this->getPullRequestAuthor( $pull ) . ' ' . $text . ' [gardening]';
+
+		return $comment;
 	}
 }
