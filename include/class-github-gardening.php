@@ -107,7 +107,7 @@ class GitHubGardening {
 			$pulls = $this->client->pulls->listPullRequests( $this->owner, $this->repo, 'all' );
 
 			foreach ( $pulls as $this->pull ) {
-_log( $this->pull );
+
 				foreach ( $this->methods as $method ) {
 
 					if ( in_array( $method, array( 'run', 'fire' ) ) ) {
@@ -121,7 +121,7 @@ _log( $this->pull );
 					}
 
 					// Run the method
-					call_user_func( array( $this, $method )  );
+					call_user_func( array( $this, $method ) );
 				}
 			}
 		}

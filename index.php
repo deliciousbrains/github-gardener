@@ -1,5 +1,5 @@
 <?php
-if ( ! file_exists( __DIR__ . '/.env.php'  ) ) {
+if ( ! file_exists( __DIR__ . '/.env.php' ) ) {
 	exit;
 }
 
