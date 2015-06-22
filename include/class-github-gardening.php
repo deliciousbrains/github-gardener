@@ -104,11 +104,22 @@ class GitHubGardening {
 		foreach ( $this->repos as $this->repo ) {
 
 			$this->getBranches();
-			$this->client->setPage();
-			$this->client->setPageSize( 100 );
-			$pulls = $this->client->pulls->listPullRequests( $this->owner, $this->repo, 'all' );
 
-			foreach ( $pulls as $this->pull ) {
+			$all_pulls = array();
+			$this->client->setPageSize( 100 );
+			$page = 1;
+			while ( $page > 0 ) {
+				$this->client->setPage( $page );
+				$pulls = $this->client->pulls->listPullRequests( $this->owner, $this->repo, 'all' );
+				if ( ! empty( $pulls ) ) {
+					$page ++;
+					$all_pulls = array_merge( $all_pulls, $pulls );
+				} else {
+					break;
+				}
+			}
+
+			foreach ( $all_pulls as $this->pull ) {
 
 				foreach ( $this->methods as $method ) {
 
