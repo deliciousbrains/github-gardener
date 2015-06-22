@@ -102,6 +102,8 @@ class GitHubGardening {
 		foreach ( $this->repos as $this->repo ) {
 
 			$this->getBranches();
+			$this->client->setPage();
+			$this->client->setPageSize( 100 );
 			$pulls = $this->client->pulls->listPullRequests( $this->owner, $this->repo, 'all' );
 
 			foreach ( $pulls as $this->pull ) {
