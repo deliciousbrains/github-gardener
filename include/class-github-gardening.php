@@ -223,7 +223,7 @@ class GitHubGardening {
 		$this->client->issues->labels->addLabelsToAnIssue( $this->owner, $this->repo, $id, $label );
 
 		// Add comment
-		$comment = $this->getComment( $pull_request, 'needs develop merged in' );
+		$comment = $this->getUserComment( $pull_request, 'needs develop merged in' );
 		// @username Needs develop merged in
 		$this->client->issues->comments->createComment( $this->owner, $this->repo, $id, $comment );
 	}
@@ -243,7 +243,7 @@ class GitHubGardening {
 
 		if ( in_array( $branch, $this->branch_names ) && false === strpos( $branch, 'release' ) ) {
 			// Add comment
-			$comment = $this->getComment( $this->pull, 'branch needs deleting' );
+			$comment = $this->getUserComment( $this->pull, 'branch needs deleting' );
 			$this->client->issues->comments->createComment( $this->owner, $this->repo, $this->pull->getNumber(), $comment );
 		}
 	}
@@ -315,9 +315,21 @@ class GitHubGardening {
 	 *
 	 * @return string
 	 */
-	private function getComment( $pull, $text ) {
-		$comment = '@' . $this->getPullRequestAuthor( $pull ) . ' ' . $text . ' [gardening]';
+	private function getUserComment( $pull, $text ) {
+		$comment = $this->getComment( $text );
+		$comment = '@' . $this->getPullRequestAuthor( $pull ) . ' ' . $comment;
 
 		return $comment;
+	}
+
+	/**
+	 * Create comment
+	 *
+	 * @param string $text
+	 *
+	 * @return string
+	 */
+	private function getComment( $text ) {
+		return $text . ' [gardening]';
 	}
 }
