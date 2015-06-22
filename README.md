@@ -9,6 +9,7 @@ Currently the script does:
 - Check for open PRs ready for review that are not mergeable, and adds a label and comment to the author.
 - Checks for un-deleted branches on closed PRs, excluding branches with 'release' in their name.
 - Label issues with open PRs with the label 'has PR'
+- Closes issues that have been resolved by a PR to a non-master branch
 
 Coming soon:
 
