@@ -50,6 +50,8 @@ class GitHubGardening {
 	 */
 	protected $branch_names;
 
+	const MASTER_BRANCH = 'develop';
+
 	/**
 	 * GitHubGardening constructor.
 	 *
@@ -249,7 +251,7 @@ class GitHubGardening {
 	}
 
 	/**
-	 * For all open PRs with a referenced issue (via 'Resolves #123'), add the label 'has PR' to the issue
+	 * For all open PRs with referenced issues (via 'Resolves #123'), add the label 'has PR' to the issues
 	 * if the label doesn't exist.
 	 *
 	 * @scope open
@@ -259,31 +261,81 @@ class GitHubGardening {
 			return;
 		}
 
+		$issues = $this->getPullRequestIssues();
+
+		foreach( $issues as $issue ) {
+			$labels       = $this->client->issues->labels->listLabelsOnAnIssue( $this->owner, $this->repo, $issue );
+			$new_label    = 'has PR';
+			$label_exists = false;
+			foreach ( $labels as $label ) {
+				if ( $new_label === $label->getName() ) {
+					$label_exists = true;
+				}
+			}
+
+			if ( $label_exists ) {
+				// Already got the label
+				continue;
+			}
+
+			// Add Label
+			$this->client->issues->labels->addLabelsToAnIssue( $this->owner, $this->repo, $issue, $new_label );
+		}
+	}
+
+	/**
+	 * Close issues that have been resolved by PRs merged into a non default branch
+	 *
+	 * @scope closed
+	 */
+	public function closeIssuesNonDefaultBranch() {
+		if ( 'closed' !== $this->pull->getState() ) {
+			return;
+		}
+
+		$pull_base_branch = $this->pull->getBase()->getRef();
+
+		if ( $pull_base_branch === self::MASTER_BRANCH ) {
+			// Pulled against default branch, ignore
+			return;
+		}
+
+		$issues = $this->getPullRequestIssues();
+
+		foreach ( $issues as $issue_id ) {
+			$issue = $this->client->issues->getIssue( $this->owner, $this->repo, $issue_id );
+
+			if ( 'closed' === $issue->getState() ) {
+				continue;
+			}
+
+			// Close the issue
+			$this->client->issues->editAnIssue( $this->owner, $this->repo, $issue->getTitle(), $issue_id, null, null, 'closed' );
+
+			// Add comment
+			$comment = $this->getComment( 'Closed as PR merged' );
+			$this->client->issues->comments->createComment( $this->owner, $this->repo, $issue_id, $comment );
+		}
+	}
+
+	/**
+	 * Get the issue IDs associated with a Pull with the 'resolves #' text
+	 *
+	 * @return array
+	 */
+	private function getPullRequestIssues() {
 		$body = $this->pull->getBody();
 
-		// Find the issue number from the body
-		preg_match( '/resolves #\s*(\d+)/i', $body, $matches );
-		if ( ! isset( $matches[1] ) || ! is_numeric( $matches[1] ) ) {
-			return;
+		// Find any issues from the body of the PR
+		preg_match_all( '/resolves #\s*(\d+)/i', $body, $matches );
+
+		$issues = array();
+
+		if ( isset( $matches[1] ) ) {
+			$issues = $matches[1];
 		}
 
-		$issue        = $matches[1];
-		$labels       = $this->client->issues->labels->listLabelsOnAnIssue( $this->owner, $this->repo, $issue );
-		$new_label    = 'has PR';
-		$label_exists = false;
-		foreach ( $labels as $label ) {
-			if ( $new_label === $label->getName() ) {
-				$label_exists = true;
-			}
-		}
-
-		if ( $label_exists ) {
-			// Already got the label
-			return;
-		}
-
-		// Add Label
-		$this->client->issues->labels->addLabelsToAnIssue( $this->owner, $this->repo, $issue, $new_label );
+		return $issues;
 	}
 
 	/**

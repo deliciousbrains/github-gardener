@@ -17,10 +17,11 @@ $repos = array(
 
 $gardening = new GitHubGardening( $access_token, $owner, $repos );
 
-$methods = array (
+$methods = array(
 	'notifyMergeIssuePullRequests',
 	'notifyUndeletedBranches',
-	'labelIssuesWithPullRequest'
+	'labelIssuesWithPullRequest',
+	'closeIssuesNonDefaultBranch'
 );
 
 $gardening->run( $methods )->fire();
