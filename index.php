@@ -12,6 +12,6 @@ $gardening = new GitHubGardening( $access_token );
 
 $gardening->notifyMergeIssuePullRequests();
 $gardening->notifyUndeletedBranches();
-
+$gardening->labelIssuesWithPullRequest();
 
 

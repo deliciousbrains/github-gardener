@@ -153,6 +153,45 @@ class GitHubGardening {
 	}
 
 	/**
+	 * For all open PRs with a referenced issue (via 'Resolves #123'), add the label 'has PR' to the issue
+	 * if the label doesn't exist.
+	 *
+	 */
+	public function labelIssuesWithPullRequest() {
+		foreach ( $this->repos as $repo ) {
+			$pulls = $this->client->pulls->listPullRequests( $this->owner, $repo, 'open' );
+
+			foreach ( $pulls as $pull ) {
+				$body = $pull->getBody();
+
+				// Find the issue number from the body
+				preg_match( '/resolves #\s*(\d+)/i', $body, $matches );
+				if ( ! isset( $matches[1] ) || ! is_numeric( $matches[1] ) ) {
+					continue;
+				}
+
+				$issue        = $matches[1];
+				$labels       = $this->client->issues->labels->listLabelsOnAnIssue( $this->owner, $repo, $issue );
+				$new_label    = 'has PR';
+				$label_exists = false;
+				foreach ( $labels as $label ) {
+					if ( $new_label === $label->getName() ) {
+						$label_exists = true;
+					}
+				}
+
+				if ( $label_exists ) {
+					// Already got the label
+					continue;
+				}
+
+				// Add Label
+				$this->client->issues->labels->addLabelsToAnIssue( $this->owner, $repo, $issue, $new_label );
+			}
+		}
+	}
+
+	/**
 	 * Get the author of the pull request
 	 *
 	 * @param int|GitHubFullPull $pull
