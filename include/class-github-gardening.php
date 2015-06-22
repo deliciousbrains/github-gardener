@@ -267,7 +267,7 @@ class GitHubGardening {
 
 		$issues = $this->getPullRequestIssues();
 
-		foreach( $issues as $issue ) {
+		foreach ( $issues as $issue ) {
 			$labels       = $this->client->issues->labels->listLabelsOnAnIssue( $this->owner, $this->repo, $issue );
 			$new_label    = 'has PR';
 			$label_exists = false;
