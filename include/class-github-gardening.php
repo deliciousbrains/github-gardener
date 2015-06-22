@@ -45,6 +45,16 @@ class GitHubGardening {
 	 */
 	protected $branches;
 
+	/**
+	 * @var
+	 */
+	protected $members;
+
+	/**
+	 * @var
+	 */
+	protected $last_committer;
+
 	const MASTER_BRANCH = 'develop';
 
 	/**
@@ -89,6 +99,7 @@ class GitHubGardening {
 			return;
 		}
 
+		$this->setMembers();
 		$this->callPullRequestMethods();
 	}
 
@@ -98,7 +109,8 @@ class GitHubGardening {
 	protected function callPullRequestMethods() {
 		foreach ( $this->repos as $this->repo ) {
 
-			$this->getBranches();
+			$this->setLastCommitter();
+			$this->setBranches();
 
 			$all_pulls = array();
 			$this->client->setPageSize( 100 );
@@ -136,15 +148,48 @@ class GitHubGardening {
 	}
 
 	/**
-	 * Get the branches for a repository and store them in an array and one just for names
+	 * Set the branches for a repository
 	 */
-	protected function getBranches() {
+	protected function setBranches() {
 		$branches       = $this->client->repos->listBranches( $this->owner, $this->repo );
 		$this->branches = array();
 
 		foreach ( $branches as $branch ) {
 			$this->branches[ $branch->getName() ] = $branch;
 		}
+	}
+
+	/**
+	 * Set the members of the teams we use for development
+	 */
+	protected function setMembers() {
+		$teams    = $this->client->orgs->teams->listTeams( $this->owner );
+		$team_ids = array();
+		foreach ( $teams as $id => $team ) {
+			if ( in_array( $team->getName(), array( 'On-Trial', 'Owners' ) ) ) {
+				$team_ids[] = $id;
+			}
+		}
+
+		$all_members = array();
+		foreach ( $team_ids as $id ) {
+			$members = $this->client->orgs->teams->listTeamMembers( $id );
+			foreach ( $members as $member ) {
+				$all_members[] = $member->getLogin();
+			}
+		}
+
+		$this->members = $all_members;
+	}
+
+	/**
+	 * Set the last committer
+	 */
+	protected function setLastCommitter() {
+		$commits = $this->client->repos->commits->listCommitsOnRepository( $this->owner, $this->repo );
+		$user    = $commits[0]->getAuthor();
+
+		$this->last_committer = $user->getLogin();
 	}
 
 	/**
@@ -252,7 +297,7 @@ class GitHubGardening {
 		$this->client->issues->labels->addLabelsToAnIssue( $this->owner, $this->repo, $id, $label );
 
 		// Add comment
-		$comment = $this->getUserComment( $pull_request, 'needs develop merged in' );
+		$comment = $this->getUserComment( 'needs develop merged in' );
 		// @username Needs develop merged in
 		$this->client->issues->comments->createComment( $this->owner, $this->repo, $id, $comment );
 	}
@@ -286,7 +331,7 @@ class GitHubGardening {
 		}
 
 		// Add comment
-		$comment = $this->getUserComment( $this->pull, 'branch needs deleting' );
+		$comment = $this->getUserComment( 'branch needs deleting' );
 		$this->client->issues->comments->createComment( $this->owner, $this->repo, $this->pull->getNumber(), $comment );
 	}
 
@@ -381,22 +426,19 @@ class GitHubGardening {
 	/**
 	 * Get the author of the pull request
 	 *
-	 * @param int|GitHubFullPull $pull
-	 * @param string             $repo
-	 *
 	 * @return string
 	 */
-	private function getPullRequestAuthor( $pull, $repo = '' ) {
-		if ( ! is_object( $pull ) ) {
-			$pull = $this->client->pulls->getSinglePullRequest( $this->owner, $repo, $pull );
+	private function getPullRequestAuthor() {
+		$user  = $this->pull->getUser();
+		$login = $user->getLogin();
+
+		if ( ! in_array( $this->members, $login ) ) {
+			// The author is not a valid team member,
+			// use the last committer insteas
+			$login = $this->last_committer;
 		}
 
-		$user = $pull->getUser();
-
-		// TODO check the author is still a valid team member
-		// TODO else use last committer on repo
-
-		return $user->getLogin();
+		return $login;
 	}
 
 	/**
