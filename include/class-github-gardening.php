@@ -270,11 +270,24 @@ class GitHubGardening {
 
 		$branch = $this->pull->getHead()->getRef();
 
-		if ( isset( $this->branches[ $branch ] ) && false === strpos( $branch, 'release' ) ) {
-			// Add comment
-			$comment = $this->getUserComment( $this->pull, 'branch needs deleting' );
-			$this->client->issues->comments->createComment( $this->owner, $this->repo, $this->pull->getNumber(), $comment );
+		if ( ! isset( $this->branches[ $branch ] ) ) {
+			// Branch has already been deleted
+			return;
 		}
+
+		if ( false !== strpos( $branch, 'release' ) ) {
+			// Don't touch release branches
+			return;
+		}
+
+		if ( in_array( $branch, array( 'develop', 'master' ) ) ) {
+			// Don't touch these branches
+			return;
+		}
+
+		// Add comment
+		$comment = $this->getUserComment( $this->pull, 'branch needs deleting' );
+		$this->client->issues->comments->createComment( $this->owner, $this->repo, $this->pull->getNumber(), $comment );
 	}
 
 	/**
