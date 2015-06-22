@@ -209,6 +209,29 @@ class GitHubGardening {
 			return;
 		}
 
+		// Get the last updated time for the base branch
+		$base = $this->pull->getBase()->getRef();
+
+		if ( ! isset( $this->branches[ $base ]->updated ) ) {
+			$branch  = $this->client->repos->getBranch( $this->owner, $this->repo, $base );
+			$updated = $branch->getCommit()->getCommit()->getAuthor()->date;
+
+			$this->branches[ $base ]->updated = $updated;
+		} else {
+			$updated = $this->branches[ $base ]->updated;
+		}
+
+		$updated_date = DateTime::createFromFormat( DateTime::ISO8601, $updated );
+		$interval     = $updated_date->diff( new DateTime() );
+		$hours        = $interval->format( '%h' );
+		$minutes      = $interval->format( '%i' );
+
+		if ( ( $hours * 60 + $minutes ) <= 10 ) {
+			// if the base branch was updated in the last 10 minutes,
+			// ignore in case the mergeable property is not updated yet.
+			return;
+		}
+
 		$pull_request = $this->client->pulls->getSinglePullRequest( $this->owner, $this->repo, $id );
 
 		if ( $pull_request->isMergeable() ) {
