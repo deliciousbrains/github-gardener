@@ -434,7 +434,7 @@ class GitHubGardening {
 
 		if ( ! in_array( $this->members, $login ) ) {
 			// The author is not a valid team member,
-			// use the last committer insteas
+			// use the last committer instead
 			$login = $this->last_committer;
 		}
 
@@ -444,14 +444,13 @@ class GitHubGardening {
 	/**
 	 * Get the comment to be added to a Pull
 	 *
-	 * @param int|GitHubFullPull $pull
 	 * @param string             $text
 	 *
 	 * @return string
 	 */
-	private function getUserComment( $pull, $text ) {
+	private function getUserComment( $text ) {
 		$comment = $this->getComment( $text );
-		$comment = '@' . $this->getPullRequestAuthor( $pull ) . ' ' . $comment;
+		$comment = '@' . $this->getPullRequestAuthor() . ' ' . $comment;
 
 		return $comment;
 	}
