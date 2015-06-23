@@ -330,8 +330,23 @@ class GitHubGardening {
 			return;
 		}
 
+		$comment_text = 'branch needs deleting';
+
+		// Check the comment hasn't already been added
+		$comments       = $this->client->issues->comments->listCommentsOnAnIssue( $this->owner, $this->repo, $this->pull->getNumber() );
+		$comment_exists = false;
+		foreach ( $comments as $comment ) {
+			if ( false !== strpos( $comment->getBody(), $comment_text ) ) {
+				$comment_exists = true;
+			}
+		}
+
+		if ( $comment_exists ) {
+			return;
+		}
+
 		// Add comment
-		$comment = $this->getUserComment( 'branch needs deleting' );
+		$comment = $this->getUserComment( $comment_text );
 		$this->client->issues->comments->createComment( $this->owner, $this->repo, $this->pull->getNumber(), $comment );
 	}
 
