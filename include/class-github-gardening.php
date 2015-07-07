@@ -33,6 +33,11 @@ class GitHubGardening {
 	/**
 	 * @var
 	 */
+	protected $pulls;
+
+	/**
+	 * @var
+	 */
 	protected $pull;
 
 	/**
@@ -112,7 +117,7 @@ class GitHubGardening {
 			$this->setLastCommitter();
 			$this->setBranches();
 
-			$all_pulls = array();
+			$this->pulls = array();
 			$this->client->setPageSize( 100 );
 			$page = 1;
 			while ( $page > 0 ) {
@@ -120,13 +125,13 @@ class GitHubGardening {
 				$pulls = $this->client->pulls->listPullRequests( $this->owner, $this->repo, 'all' );
 				if ( ! empty( $pulls ) ) {
 					$page ++;
-					$all_pulls = array_merge( $all_pulls, $pulls );
+					$this->pulls = array_merge( $this->pulls, $pulls );
 				} else {
 					break;
 				}
 			}
 
-			foreach ( $all_pulls as $this->pull ) {
+			foreach ( $this->pulls as $this->pull ) {
 
 				foreach ( $this->methods as $method ) {
 
