@@ -335,6 +335,17 @@ class GitHubGardening {
 			return;
 		}
 
+		foreach( $this->pulls as $pull ) {
+			if ( 'open' !== $pull->getState() ) {
+				continue;
+			}
+
+			if ( $branch === $pull->getHead()->getRef() ) {
+				// Branch used in another open PR
+				return;
+			}
+		}
+
 		$comment_text = 'branch needs deleting';
 
 		// Check the comment hasn't already been added
