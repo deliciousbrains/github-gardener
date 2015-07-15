@@ -36,7 +36,7 @@ class GitHubGardening {
 	protected $pulls;
 
 	/**
-	 * @var
+	 * @var GitHubPull
 	 */
 	protected $pull;
 
@@ -427,6 +427,11 @@ class GitHubGardening {
 				continue;
 			}
 
+			if ( $this->isIssueResolvedByOpenPRUsingSameBranch( $issue_id ) ) {
+				// Ignore issue as it is resolved by another open PR using the same branch
+				continue;
+			}
+
 			// Close the issue
 			$this->client->issues->editAnIssue( $this->owner, $this->repo, $issue->getTitle(), $issue_id, null, null, 'closed' );
 
@@ -437,12 +442,46 @@ class GitHubGardening {
 	}
 
 	/**
+	 * Check if an issue is resolved by an open PR using the same branch as the current PR
+	 *
+	 * @param $issue_id
+	 *
+	 * @return bool
+	 */
+	private function isIssueResolvedByOpenPRUsingSameBranch( $issue_id ) {
+		foreach ( $this->pulls as $pull ) {
+			if ( 'open' !== $pull->getState() ) {
+				continue;
+			}
+
+			if ( $this->pull->getHead()->getRef() !== $pull->getHead()->getRef() ) {
+				// Not using the same head branch
+				continue;
+			}
+
+			$issues = $this->getPullRequestIssues( $pull );
+
+			if ( in_array( $issue_id, $issues ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Get the issue IDs associated with a Pull with the 'resolves #' text
+	 *
+	 * @param GitHubPull|null $pull
 	 *
 	 * @return array
 	 */
-	private function getPullRequestIssues() {
-		$body = $this->pull->getBody();
+	private function getPullRequestIssues( $pull = null ) {
+		if ( is_null( $pull ) ) {
+			$pull = $this->pull;
+		}
+
+		$body = $pull->getBody();
 
 		// Find any issues from the body of the PR
 		preg_match_all( '/resolves #\s*(\d+)/i', $body, $matches );
