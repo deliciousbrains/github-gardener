@@ -516,13 +516,17 @@ class GitHubGardening {
 	/**
 	 * Get the comment to be added to a Pull
 	 *
-	 * @param string             $text
+	 * @param string      $text
+	 * @param string|null $username
 	 *
 	 * @return string
 	 */
-	private function getUserComment( $text ) {
+	private function getUserComment( $text, $username = null ) {
 		$comment = $this->getComment( $text );
-		$comment = '@' . $this->getPullRequestAuthor() . ' ' . $comment;
+		if ( is_null( $username ) ) {
+			$username = $this->getPullRequestAuthor();
+		}
+		$comment = '@' . $username . ' ' . $comment;
 
 		return $comment;
 	}
