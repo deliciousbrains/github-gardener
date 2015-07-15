@@ -62,6 +62,8 @@ class GitHubGardening {
 
 	const MASTER_BRANCH = 'develop';
 
+	const COMMENT_SUFFIX = 'gardening';
+
 	/**
 	 * GitHubGardening constructor.
 	 *
@@ -494,6 +496,6 @@ class GitHubGardening {
 	 * @return string
 	 */
 	private function getComment( $text ) {
-		return $text . ' [gardening]';
+		return $text . ' [' . self::COMMENT_SUFFIX .']';
 	}
 }
