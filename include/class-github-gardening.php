@@ -427,8 +427,8 @@ class GitHubGardening {
 				continue;
 			}
 
-			if ( $this->isIssueResolvedByOpenPRUsingSameBranch( $issue_id ) ) {
-				// Ignore issue as it is resolved by another open PR using the same branch
+			if ( $this->isIssueResolvedByOpenPR( $issue_id ) ) {
+				// Ignore issue as it is resolved by another open PR against the same base branch
 				continue;
 			}
 
@@ -448,14 +448,14 @@ class GitHubGardening {
 	 *
 	 * @return bool
 	 */
-	private function isIssueResolvedByOpenPRUsingSameBranch( $issue_id ) {
+	private function isIssueResolvedByOpenPR( $issue_id ) {
 		foreach ( $this->pulls as $pull ) {
 			if ( 'open' !== $pull->getState() ) {
 				continue;
 			}
 
-			if ( $this->pull->getHead()->getRef() !== $pull->getHead()->getRef() ) {
-				// Not using the same head branch
+			if ( $this->pull->getBase()->getRef() !== $pull->getBase()->getRef() ) {
+				// Not using the same base branch
 				continue;
 			}
 
