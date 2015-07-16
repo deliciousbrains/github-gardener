@@ -286,7 +286,7 @@ class GitHubGardening {
 
 		$pull_request = $this->client->pulls->getSinglePullRequest( $this->owner, $this->repo, $id );
 
-		if ( $pull_request->isMergeable() ) {
+		if ( false !== $pull_request->isMergeable() ) {
 			if ( $label_exists ) {
 				// TODO remove label
 			}
