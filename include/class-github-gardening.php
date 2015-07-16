@@ -304,7 +304,7 @@ class GitHubGardening {
 		$this->client->issues->labels->addLabelsToAnIssue( $this->owner, $this->repo, $id, $label );
 
 		// Add comment
-		$comment = $this->getUserComment( 'needs develop merged in' );
+		$comment = $this->getUserComment( 'needs ' . $base . ' merged in' );
 		// @username Needs develop merged in
 		$this->client->issues->comments->createComment( $this->owner, $this->repo, $id, $comment );
 	}
