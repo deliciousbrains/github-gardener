@@ -21,7 +21,8 @@ $methods = array(
 	'notifyMergeIssuePullRequests',
 	'notifyUndeletedBranches',
 	'labelIssuesWithPullRequest',
-	'closeIssuesNonDefaultBranch'
+	'closeIssuesNonDefaultBranch',
+	'cleanClosedPullRequestLabels',
 );
 
 $gardening->run( $methods )->fire();

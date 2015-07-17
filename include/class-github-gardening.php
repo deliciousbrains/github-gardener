@@ -228,8 +228,7 @@ class GitHubGardening {
 
 		// Remove redundant labels
 		foreach ( $labels_to_remove as $label ) {
-			// TODO
-			#$this->client->issues->labels->removeLabelFromAnIssue( $this->owner, $this->repo, $id, $label );
+			$this->client->issues->labels->removeLabelFromAnIssue( $this->owner, $this->repo, $id, $label );
 		}
 	}
 
@@ -288,7 +287,8 @@ class GitHubGardening {
 
 		if ( false !== $pull_request->isMergeable() ) {
 			if ( $label_exists ) {
-				// TODO remove label
+				// Remove the 'needs merge' label
+				$this->client->issues->labels->removeLabelFromAnIssue( $this->owner, $this->repo, $id, 'needs merge' );
 			}
 
 			return;
