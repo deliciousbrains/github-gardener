@@ -504,7 +504,7 @@ class GitHubGardening {
 		$user  = $this->pull->getUser();
 		$login = $user->getLogin();
 
-		if ( ! in_array( $this->members, $login ) ) {
+		if ( ! in_array( $login, $this->members ) ) {
 			// The author is not a valid team member,
 			// use the last committer instead
 			$login = $this->last_committer;
