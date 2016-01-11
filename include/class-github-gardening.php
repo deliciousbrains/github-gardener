@@ -303,6 +303,9 @@ class GitHubGardening {
 		$label = 'needs merge';
 		$this->client->issues->labels->addLabelsToAnIssue( $this->owner, $this->repo, $id, $label );
 
+		// Remove the 'ready for review' label
+		$this->client->issues->labels->removeLabelFromAnIssue( $this->owner, $this->repo, $id, 'ready for review' );
+
 		// Add comment
 		$comment = $this->getUserComment( 'needs ' . $base . ' merged in' );
 		// @username Needs develop merged in
