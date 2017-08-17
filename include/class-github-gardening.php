@@ -25,6 +25,8 @@ class GitHubGardening {
 	 */
 	protected $repos;
 
+	protected $teams;
+
 	/**
 	 * @var array
 	 */
@@ -68,21 +70,38 @@ class GitHubGardening {
 	 * GitHubGardening constructor.
 	 *
 	 * @param string|null  $token
-	 * @param string       $owner
-	 * @param array|string $repos
 	 *
 	 * @throws GitHubClientException
 	 */
-	public function __construct( $token = null, $owner, $repos ) {
+	public function __construct( $token = null ) {
 		$this->client = new GitHubClient();
 		$this->client->setAuthType( 'x-oauth-basic' );
 		$this->client->setOauthKey( $token );
+	}
 
-		$this->owner = $owner;
+	/**
+	 * @param array $repos
+	 */
+	public function setRepos( $repos ) {
 		if ( is_string( $repos ) ) {
 			$repos = array( $repos );
 		}
+
 		$this->repos = $repos;
+	}
+
+	/**
+	 * @param mixed $teams
+	 */
+	public function setTeams( $teams ) {
+		$this->teams = $teams;
+	}
+
+	/**
+	 * @param string $owner
+	 */
+	public function setOwner( $owner ) {
+		$this->owner = $owner;
 	}
 
 	/**
@@ -173,7 +192,7 @@ class GitHubGardening {
 		$teams    = $this->client->orgs->teams->listTeams( $this->owner );
 		$team_ids = array();
 		foreach ( $teams as $id => $team ) {
-			if ( in_array( $team->getName(), array( 'On-Trial', 'Owners' ) ) ) {
+			if ( in_array( $team->getName(), $this->teams ) ) {
 				$team_ids[] = $id;
 			}
 		}
