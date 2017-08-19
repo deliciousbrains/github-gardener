@@ -192,7 +192,7 @@ class GitHubGardening {
 		$teams    = $this->client->orgs->teams->listTeams( $this->owner );
 		$team_ids = array();
 		foreach ( $teams as $id => $team ) {
-			if ( in_array( $team->getName(), $this->teams ) ) {
+			if ( empty( $this->teams ) || in_array( $team->getName(), $this->teams ) ) {
 				$team_ids[] = $id;
 			}
 		}
