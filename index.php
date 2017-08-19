@@ -12,12 +12,13 @@ $gardening = new GitHubGardening( $access_token );
 $gardening->setOwner( $owner );
 $gardening->setRepos( $repos );
 $gardening->setTeams( $teams );
+$gardening->setRedundantLabels( $redundant_labels );
 
 $methods = array(
-	'notifyMergeIssuePullRequests',
-	'notifyUndeletedBranches',
-	'labelIssuesWithPullRequest',
-	'closeIssuesNonDefaultBranch',
+//	'notifyMergeIssuePullRequests',
+//	'notifyUndeletedBranches',
+//	'labelIssuesWithPullRequest',
+//	'closeIssuesNonDefaultBranch',
 	'cleanClosedPullRequestLabels',
 );
 

@@ -13,3 +13,9 @@ $repos = array(
 	'my-repo',
 	'another-repo',
 );
+
+// Add as many labels that should be removed from closed PRs
+$redundant_labels = array(
+	'ready for review',
+	'in progress',
+);

@@ -25,7 +25,15 @@ class GitHubGardening {
 	 */
 	protected $repos;
 
+	/**
+	 * @var array
+	 */
 	protected $teams;
+
+	/**
+	 * @var array
+	 */
+	protected $redundant_labels;
 
 	/**
 	 * @var array
@@ -102,6 +110,13 @@ class GitHubGardening {
 	 */
 	public function setOwner( $owner ) {
 		$this->owner = $owner;
+	}
+
+	/**
+	 * @param array $redundant_labels
+	 */
+	public function setRedundantLabels( $redundant_labels ) {
+		$this->redundant_labels = $redundant_labels;
 	}
 
 	/**
@@ -224,6 +239,10 @@ class GitHubGardening {
 	 * @scope closed
 	 */
 	public function cleanClosedPullRequestLabels() {
+		if ( empty( $this->redundant_labels ) ) {
+			return;
+		}
+
 		if ( 'closed' !== $this->pull->getState() ) {
 			return;
 		}
@@ -232,10 +251,9 @@ class GitHubGardening {
 		$labels = $this->client->issues->labels->listLabelsOnAnIssue( $this->owner, $this->repo, $id );
 
 		$process_replacement = false;
-		$redundant_labels    = array( 'ready for review', 'needs merge' );
 		$labels_to_remove    = array();
 		foreach ( $labels as $label ) {
-			if ( in_array( $label->getName(), $redundant_labels ) ) {
+			if ( in_array( $label->getName(), $this->redundant_labels ) ) {
 				$labels_to_remove[]  = $label->getName();
 				$process_replacement = true;
 			}
